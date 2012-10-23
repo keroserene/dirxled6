@@ -2,7 +2,7 @@
 
 Directional Indicator for 6 LEDs on Arduino
 Copyright (C) 2012 Serene Han
-  
+	
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
@@ -10,11 +10,11 @@ the Free Software Foundation, either version 3 of the License, or
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+along with this program.	If not, see <http://www.gnu.org/licenses/>.
 
 */
 #define TOTAL_LEDS 6
@@ -31,9 +31,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define DEGREE_SEGMENT (360/TOTAL_LEDS)
 #define ANALOG_MAX 255
 
-// Simplify access to output LEDs
+// Simplifies access to output direction boundary-LEDs.
 int leds[] = {LED_N, LED_NE, LED_SE, LED_S, LED_SW, LED_NW};
-int oAlpha, oOmega = 0; // Store previously lit LEDs to optimize reset
+
+// Store previously lit LEDs to optimize resetting when direction changes.
+int oAlpha, oOmega = 0; 
 
 float d = 0; // Temporary.
 
@@ -42,15 +44,15 @@ void setup() {}
 // The following is a test that just runs the light in
 // a circle.
 void loop() {
-  directionToLED(d);
-  
-  d += 6;
-  if (d > 360) 
-    d -= 360;
-  delay(20);
+	directionToLED(d);
+	
+	d += 6;
+	if (d > 360) 
+		d -= 360;
+	delay(20);
 }
 
-// Light up the LEDs corresponding to direction.
+// Light up LEDs corresponding to direction.
 //
 // Angular bearing starts at 0-degrees north and increases clockwise.
 //
@@ -63,46 +65,48 @@ void loop() {
 // However, 240-degrees would light up SW maximally at 255.
 //
 // Args:
-//   angle - Input angle (in degrees) 
+//	 angle - Input angle (in degrees) 
 //
-// Returns nothing
+// Returns nothingpull
 void directionToLED(float angle) {
-  
-  // Determine boundary LEDs of target angle segment.
-  int seg = (int)angleWrap(angle)/DEGREE_SEGMENT;
-  int alpha = leds[seg];
-  int omega = leds[(seg + 1) % TOTAL_LEDS];
-  
-  // Reset previously lit LEDs if they in use with current indication.
-  if (oAlpha != alpha && oAlpha != omega)
-    analogWrite(oAlpha, 0);
-  if (oOmega != alpha && oAlpha != omega)
-    analogWrite(oOmega, 0);
-  
-  // Determine percent offset of angle within target segment,
-  // which determines intensity of boundary P.W.M. LEDs.
-  float raw = floatModulus(angle, DEGREE_SEGMENT);
-  float intensity = ANALOG_MAX * (raw/DEGREE_SEGMENT);
-  analogWrite(alpha, ANALOG_MAX - intensity);
-  analogWrite(omega, intensity);
-  
-  // Remember LEDs.
-  oAlpha = alpha; 
-  oOmega = omega;
+	
+	// Determine boundary LEDs corresponding to target angle segment.
+	int seg = (int)angleWrap(angle)/DEGREE_SEGMENT;
+	int alpha = leds[seg];
+	int omega = leds[(seg + 1) % TOTAL_LEDS];
+	
+	// Reset previous LEDs if not relevant to current situation.
+	if (oAlpha != alpha && oAlpha != omega)
+		analogWrite(oAlpha, 0);
+	if (oOmega != alpha && oAlpha != omega)
+		analogWrite(oOmega, 0);
+	
+	// Interpolate. Percent-offset of current angle within target segment
+	// determines intensity of boundary P.W.M. LEDs.
+	float raw = floatModulus(angle, DEGREE_SEGMENT);
+	float intensity = ANALOG_MAX * (raw/DEGREE_SEGMENT);
+	analogWrite(alpha, ANALOG_MAX - intensity);
+	analogWrite(omega, intensity);
+	
+	// Remember LEDs.
+	oAlpha = alpha; 
+	oOmega = omega;
 }
-  
+	
 // Force an angle (in degrees) between 0-359
-float angleWrap(float angle) { return floatModulus(angle, 360); }
+float angleWrap(float angle) { 
+	return floatModulus(angle, 360); 
+}
 
 // Helper: Forces a floating point modulo'd within an int range,
 // without losing the fractional bit.
 //
 // Args:
-//   x - Input floating point
-//   m - Modulus (must be positive)
+//	 x - Input floating point
+//	 m - Modulus (must be positive)
 //
-// Returns remainder of x divided by m
+// Returns "remainder" of x divided by m
 float floatModulus(float x, int m) {
-  float frac = x - (int)x; 
-  return frac + ((int)x % m);
+	float frac = x - (int)x; 
+	return frac + ((int)x % m);
 }
