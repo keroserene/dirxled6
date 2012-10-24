@@ -1,6 +1,5 @@
 Assumption: we're on Arduino Uno.
 
-
 --- Wiring ---
 This code requires wires going from each analog output pin on LED in order starting from North.
 So for Uno, which has 6 Analog outputs on pins 3, 5, 6, 9, 10, and 11:
